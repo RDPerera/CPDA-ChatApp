@@ -6,19 +6,28 @@ import React, { useEffect } from "react";
 import { Widget, addResponseMessage } from "react-chat-widget";
 import "react-chat-widget/lib/styles.css";
 import axios from "axios";
+import ProgressBar from "@ramonak/react-progress-bar";
+
 
 function App() {
+  Number.prototype.round = function(places) {
+    return +(Math.round(this + "e+" + places)  + "e-" + places);
+  }
   useEffect(() => {
     addResponseMessage("Welcome to **CPDA Bot** test!");
   }, []);
-
+  const [results, setResults] = React.useState([]);
   const handleNewUserMessage = async (newMessage) => {
     console.log(`New message incoming! ${newMessage}`);
-    //send message to the server
-    const response = await axios.post("http://127.0.0.1:5000/hello", {
-      message: "hi",
-    });
-
+    //do a request to the server
+    const response = await axios.get("http://127.0.0.1:5000/reply", {
+      params: {
+        message: newMessage
+        }
+      });
+    //add the response to the chat
+    addResponseMessage(response.data.responce);
+    setResults(response.data.details);
   };
   return (
     <>
@@ -48,12 +57,19 @@ function App() {
           </p>
         </div>
         <div className="content">
+          <div className="accuracy-container">
+            <div className="accuracy-block">
+          {results.map((result, index) => (
+          <span className="set"><h5>{result.emotion}</h5><ProgressBar completed={parseFloat(result.score*100).round(2)} bgColor={"#" + (Math.random() * 16777215 | 0).toString(16)} /></span>
+          ))}
+          </div>
           <Widget
             handleNewUserMessage={handleNewUserMessage}
             profileAvatar={chatlogo}
             title="CPDA Chat"
             subtitle="Cancer Patient Distress Assistant Chat Application"
           />
+        </div>
         </div>
       </div>
     </>

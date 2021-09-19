@@ -24,3 +24,12 @@ code {
 .header{
   color: rgb(71, 71, 71);
 }
+.accuracy-block {
+  margin-top: 300px;
+  color: rgb(56, 56, 56);
+  text-transform:capitalize;
+  width: 50%;
+}
+.set{
+  padding: 10px; 
+}
