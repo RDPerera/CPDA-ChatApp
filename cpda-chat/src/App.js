@@ -9,7 +9,32 @@ import axios from "axios";
 import ProgressBar from "@ramonak/react-progress-bar";
 
 
+
 function App() {
+
+
+
+  const common_questions = {
+    "greetings":["hi there! ", "hello there!", "hello" , "hi"],
+    "goodbye":["bye! ", "see you!", "bye", "goodbye"],
+    "aksingAge" : ["how old are you?", "your age?", "age?","age?"],
+    "aksingName" : ["what is your name?", "your name?", "name?","introduce yourself","what's your name","Who are you?"],
+    "howareyou":["how are you?", "how are you doing?"],
+  }
+  const common_answers = {
+    "greetings":["Hi there! ", "Hello there!", "Hello" , "Hi"],
+    "fullfill":["how are you?", "how are you doing?"],
+    "goodbye":["bye! ", "see you!", "bye", "goodbye"],
+    "aksingAge" : ["I was built in September of 2021"],
+    "aksingName" : ["My name is CPDA","I'm CPDA"],
+    "howareyou":["I'm fine, thanks for asking"],
+  }
+  const isInArray = (value, array) => {
+    return array.indexOf(value) > -1;
+  }
+  const pickRandom = (array) => {
+    return array[Math.floor(Math.random() * array.length)];
+  }
   Number.prototype.round = function(places) {
     return +(Math.round(this + "e+" + places)  + "e-" + places);
   }
@@ -19,15 +44,29 @@ function App() {
   const [results, setResults] = React.useState([]);
   const handleNewUserMessage = async (newMessage) => {
     console.log(`New message incoming! ${newMessage}`);
-    //do a request to the server
-    const response = await axios.get("http://127.0.0.1:5000/reply", {
-      params: {
-        message: newMessage
+    let isCommonQuestion = false;
+    //answering common questions
+    for (let key in common_questions) {
+      if (isInArray(newMessage.toLowerCase(), common_questions[key])) {
+        isCommonQuestion = true;
+        addResponseMessage(pickRandom(common_answers[key]));
+        if (key === "greetings") {
+          addResponseMessage(pickRandom(common_answers["fullfill"]));
         }
-      });
-    //add the response to the chat
-    addResponseMessage(response.data.responce);
-    setResults(response.data.details);
+        setResults([]);
+      }
+    }
+    if (!isCommonQuestion) {
+      //do a request to the server
+      const response = await axios.get("http://127.0.0.1:5000/reply", {
+        params: {
+          message: newMessage
+          }
+        });
+      //add the response to the chat
+      addResponseMessage(response.data.responce);
+      setResults(response.data.details);
+    }
   };
   return (
     <>
